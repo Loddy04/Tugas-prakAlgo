@@ -38,50 +38,86 @@ void tampilmhs() {
         cout << "Tidak ada data mahasiswa.\n";
         return;
     }
-
-    Mahasiswa mhs;
-    cout << "\nDaftar Mahasiswa:\n\n";
-    while (fread(&mhs, sizeof(Mahasiswa), 1, file)) {
-            cout << "Nama     : " << mhs.nama; 
-            cout << "\nNIM      : " << mhs.nim;
-            cout << "\nJurusan  : " << mhs.jurusan; 
-            cout << "\nAngkatan : " << mhs.angkatan; 
-            cout << "\nIPK      : " << mhs.ipk; 
-            cout << "\n------------------------\n";
+    
+    Mahasiswa mahasiswa[100];
+    int count = 0;
+    while (fread(&mahasiswa[count], sizeof(Mahasiswa), 1, file)) {
+        count++;
     }
     fclose(file);
+    
+    bubbleSort(mahasiswa, count);
+    
+    cout << "\nDaftar Mahasiswa (Diurutkan Berdasarkan NIM):\n\n";
+    for (int i = 0; i < count; i++) {
+        cout << "Nama     : " << mahasiswa[i].nama
+             << "\nNIM      : " << mahasiswa[i].nim
+             << "\nJurusan  : " << mahasiswa[i].jurusan
+             << "\nAngkatan : " << mahasiswa[i].angkatan
+             << "\nIPK      : " << mahasiswa[i].ipk
+             << "\n------------------------\n";
+    }
+}
+
+int partition(Mahasiswa arr[], int low, int high) {
+    int pivot = arr[high].nim;
+    int i = low - 1;
+    for (int j = low; j < high; j++) {
+        if (arr[j].nim < pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return i + 1;
+}
+
+void quickSort(Mahasiswa arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+int binarySearch(Mahasiswa arr[], int left, int right, int nim) {
+    while (left <= right) {
+        int mid = left + (right - left) / 2;
+        if (arr[mid].nim == nim) return mid;
+        if (arr[mid].nim < nim) left = mid + 1;
+        else right = mid - 1;
+    }
+    return -1;
 }
 
 void carinimmhs() {
     FILE *file = fopen("MahasiswaData.dat", "rb");
     if (!file) {
         cout << "Tidak ada data mahasiswa.\n";
-        cout << "-------------------------\n";
         return;
     }
-
+    
+    Mahasiswa mahasiswa[100];
+    int count = 0;
+    while (fread(&mahasiswa[count], sizeof(Mahasiswa), 1, file)) {
+        count++;
+    }
+    fclose(file);
+    
+    quickSort(mahasiswa, 0, count - 1);
+    
     int nim;
     cout << "Masukkan NIM yang dicari: ";
     cin >> nim;
-
-    Mahasiswa mhs;
-    bool found = false;
-    while (fread(&mhs, sizeof(Mahasiswa), 1, file)) {
-        if (mhs.nim == nim) {
-            cout << "\nMahasiswa ditemukan!";
-            cout << "\n--------------------";
-            cout << "\nNama     :"  << mhs.nama; 
-            cout << "\nJurusan  : " << mhs.jurusan; 
-            cout << "\nAngkatan : " << mhs.angkatan; 
-            cout << "\nIPK      : " << mhs.ipk;
-            cout << "\n--------------------\n";
-            found = true;
-            break;
-        }
-    }
-    fclose(file);
-
-    if (!found) {
+    
+    int index = binarySearch(mahasiswa, 0, count - 1, nim);
+    if (index != -1) {
+        cout << "\nMahasiswa ditemukan!\nNama     : " << mahasiswa[index].nama
+             << "\nJurusan  : " << mahasiswa[index].jurusan
+             << "\nAngkatan : " << mahasiswa[index].angkatan
+             << "\nIPK      : " << mahasiswa[index].ipk
+             << "\n--------------------\n";
+    } else {
         cout << "Mahasiswa dengan NIM " << nim << " tidak ditemukan!\n";
     }
 }
@@ -92,27 +128,26 @@ void carijurusanmhs() {
         cout << "Tidak ada data mahasiswa.\n";
         return;
     }
-
+    
     char jurusan[50];
     cout << "Masukkan jurusan yang dicari: ";
     cin.ignore();
     cin.getline(jurusan, 50);
-
+    
     Mahasiswa mhs;
     bool found = false;
     while (fread(&mhs, sizeof(Mahasiswa), 1, file)) {
         if (strcmp(mhs.jurusan, jurusan) == 0) {
-            cout << "\nMahasiswa ditemukan!";
-            cout << "\nNama     :"  << mhs.nama; 
-            cout << "\nJurusan  : " << mhs.jurusan; 
-            cout << "\nAngkatan : " << mhs.angkatan; 
-            cout << "\nIPK      : " << mhs.ipk;
-            cout << "\n";
+            cout << "\nMahasiswa ditemukan!\nNama     : " << mhs.nama
+                 << "\nJurusan  : " << mhs.jurusan
+                 << "\nAngkatan : " << mhs.angkatan
+                 << "\nIPK      : " << mhs.ipk
+                 << "\n--------------------\n";
             found = true;
         }
     }
     fclose(file);
-
+    
     if (!found) cout << "Mahasiswa dengan jurusan " << jurusan << " tidak ditemukan!\n";
 }
 
