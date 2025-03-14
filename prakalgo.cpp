@@ -128,7 +128,7 @@ int main(){
         cout << "3. Cari berdasarkan nama\n";
         cout << "4. Sort IPK mahasiswa (asc)\n";
         cout << "5. Sort IPK mahasiswa (desc)\n";
-        cout << "6. Keluar\n";
+        cout << "6. Keluar Dari Program\n";
         cout << "-----------------------------\n";
         cout << "Pilih menu = ";
         cin >> pilmenu;
